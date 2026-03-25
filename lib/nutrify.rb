@@ -7,4 +7,10 @@ require_relative "nutrify/client"
 
 module Nutrify
   class Error < StandardError; end
+
+  class Additive
+    def self.find_by_code(code)
+      Nutrify::DbManager.find(code)
+    end
+  end
 end
