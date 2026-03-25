@@ -2,6 +2,7 @@
 
 require "yaml"
 require "open-uri"
+require "net/http"
 
 module Nutrify
   class DbManager
@@ -17,7 +18,7 @@ module Nutrify
 
       url = "https://raw.githubusercontent.com/openfoodfacts/off-server/main/config/taxonomies/additives.txt"
 
-      content = URI.open(url).read
+      content = Net::HTTP.get(URI(url))
 
       new_data = {}
       content.each_line do |line|
