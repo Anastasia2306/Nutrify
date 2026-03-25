@@ -12,14 +12,19 @@ module Nutrify
   class Additive
     def self.find_by_code(code)
       clean_code = code.to_s.downcase
-      data = Nutrify::DbManager.find(clean_code) || Nutrify::DbManager.find("en:#{clean_code}")
 
-      return nil unless data
+      raw_data = Nutrify::DbManager.find(clean_code) ||
+                 Nutrify::DbManager.find("en:#{clean_code}") ||
+                 Nutrify::DbManager.find(code.to_s.upcase)
 
-      obj = OpenStruct.new(data)
+      return nil unless raw_data
+
+      obj = OpenStruct.new(raw_data)
 
       obj.code ||= code.to_s.upcase
+      obj.name ||= raw_data["name"] || "Добавка"
       obj.allergens ||= []
+      obj.contraindications ||= []
       obj.category ||= "Пищевая добавка"
 
       obj.daily_limit_mg_per_kg ||= if obj.code.include?("621")
