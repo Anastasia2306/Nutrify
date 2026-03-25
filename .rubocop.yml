@@ -1,11 +1,13 @@
 AllCops:
   NewCops: enable
   Exclude:
+    - 'vendor/**/*'
     - 'bin/**/*'
+    - 'db/**/*'
   SuggestExtensions: false
 
-Layout/EndOfLine:
-  Enabled: false
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
 
 Style/Documentation:
   Enabled: false
@@ -13,5 +15,8 @@ Style/Documentation:
 Metrics/MethodLength:
   Max: 20
 
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
+Layout/EndOfLine:
+  Enabled: false
+
+Gemspec/RequireMFA:
+  Enabled: false
