@@ -7,34 +7,35 @@ module Nutrify
   class Client
     BASE_URL = "https://world.openfoodfacts.org/api/v0"
 
-    def fetch_product(barcode)
-      response = Faraday.get("#{BASE_URL}/product/#{barcode}.json")
-      return { error: "Ошибка сети" } unless response.success?
-
-      data = JSON.parse(response.body)
-      return { error: "Продукт не найден" } if data["status"].zero?
-
-      {
-        name: data.dig("product", "product_name"),
-        additives_tags: data.dig("product", "additives_tags") || []
-      }
+    def initialize
+      @connection = Faraday.new(url: BASE_URL) do |f|
+        f.options.timeout = 5
+        f.adapter Faraday.default_adapter
+      end
     end
 
     def analyze(barcode)
-      product = fetch_product(barcode)
-      return product if product[:error]
+      response = @connection.get("product/#{barcode}.json")
+      return nil unless response.success?
 
-      found_codes = product[:additives_tags].map { |tag| tag.split(":").last.upcase }
+      data = JSON.parse(response.body)
+      return nil if data["status"].zero?
 
-      details = found_codes.map do |code|
-        info = Nutrify::ADDITIVES[code] || { name: "Неизвестная добавка" }
-        { code: code }.merge(info)
-      end
+      p_data = data["product"]
 
-      {
-        product_name: product[:name],
-        analysis: details
-      }
+      Nutrify::Product.new(
+        barcode: barcode,
+        name: p_data["product_name"],
+        additives: parse_additives(p_data),
+        ingredients_text: p_data["ingredients_text"]
+      )
+    end
+
+    private
+
+    def parse_additives(p_data)
+      tags = p_data["additives_tags"] || []
+      tags.map { |tag| tag.split(":").last.upcase }
     end
   end
 end
