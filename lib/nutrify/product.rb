@@ -6,7 +6,7 @@ module Nutrify
 
     def initialize(barcode:, name:, additives: [], ingredients_text: "")
       @barcode = barcode
-      @name = name || "Неизвестный продукт"
+      @name = name || "Unknown Product"
       @additives = additives
       @ingredients_text = ingredients_text
     end
