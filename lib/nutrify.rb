@@ -13,7 +13,8 @@ module Nutrify
       data = Nutrify::DbManager.find(code)
       return nil unless data
 
-      Struct.new(*data.keys.map(&:to_sym)).new(*data.values)
+      require "ostruct"
+      OpenStruct.new(data)
     end
   end
 end
