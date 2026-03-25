@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # lib/nutri_analyzer.rb
 require_relative "nutri_analyzer/version"
 require_relative "nutri_analyzer/additive"
@@ -10,7 +12,7 @@ require_relative "nutri_analyzer/comparator"
 module NutriAnalyzer
   class Error < StandardError; end
 
-  # Принимает текст состава и профиль, возвращает отчёт
+  # Удобная точка входа: принимает текст состава и профиль, возвращает отчёт
   def self.analyze_product(product_name, ingredients_text, profile = nil)
     additives = Parser.parse(ingredients_text)
     analyzer = Analyzer.new(additives, profile)

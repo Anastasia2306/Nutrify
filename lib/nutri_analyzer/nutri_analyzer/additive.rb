@@ -1,12 +1,10 @@
+# frozen_string_literal: true
+
 # lib/nutri_analyzer/additive.rb
 module NutriAnalyzer
   # Класс, предоставляющий информацию о пищевой добавке.
-  # Ожидается, что Полинка реализует методы:
-  #   .find_by_code(code)    -> Additive | nil
-  #   .find_by_name(name)    -> Additive | nil
-  #   .all                   -> Array<Additive>
   class Additive
-    # Пример данных (будет загружаться из API)
+    # Пример данных (в реальности загружается из API)
     DATA = {
       "E621" => {
         name: "Глутамат натрия",
@@ -35,7 +33,7 @@ module NutriAnalyzer
         daily_limit_mg_per_kg: nil,
         allergens: ["соя"]
       }
-    }
+    }.freeze
 
     attr_reader :code, :name, :category, :origin, :risks,
                 :contraindications, :daily_limit_mg_per_kg, :allergens
@@ -55,6 +53,7 @@ module NutriAnalyzer
     def self.find_by_code(code)
       code = code.upcase
       return nil unless DATA.key?(code)
+
       new(code, DATA[code])
     end
 
