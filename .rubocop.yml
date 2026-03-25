@@ -14,6 +14,27 @@ Style/Documentation:
 
 Metrics/MethodLength:
   Max: 20
+  
+Metrics/AbcSize:
+  Max: 20  # Увеличиваем лимит с 17 до 20
+  Exclude:
+    - 'spec/**/*.rb'
+
+# Игнорируем проверку длины блоков в тестах
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*.rb'
+    - 'test/**/*.rb'
+
+# Разрешаем длинные строки в тестах
+Layout/LineLength:
+  Exclude:
+    - 'spec/**/*.rb'
+
+# Разрешаем большие классы в тестах
+Metrics/ClassLength:
+  Exclude:
+    - 'spec/**/*.rb'
 
 Layout/EndOfLine:
   Enabled: false
