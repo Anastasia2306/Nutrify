@@ -5,8 +5,8 @@ require_relative "lib/nutrify/version"
 Gem::Specification.new do |spec|
   spec.name = "Nutrify"
   spec.version = Nutrify::VERSION
-  spec.authors = ["Anastasia", "Polina"]
-  spec.email = ["anastasia@1c-developer.ru", "dyatlowskaya.polina@yandex.ru"]   
+  spec.authors = %w[Anastasia Polina]
+  spec.email = ["anastasia@1c-developer.ru", "dyatlowskaya.polina@yandex.ru"]
 
   spec.summary = "Анализатор пищевых добавок и нутрицевтиков"
   spec.description = "Поиск вредных Е-добавок через OpenFoodFacts API"
