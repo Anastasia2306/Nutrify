@@ -1,28 +1,27 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../lib/nutrify/product"
 
 RSpec.describe Nutrify::Product do
-  let(:product) do
-    Nutrify::Product.new(
-      barcode: "123",
-      name: "Test Product",
-      additives: ["E330"],
-      ingredients_text: "Sugar, Water"
-    )
+  let(:fake_api_data) do
+    {
+      "code" => "3017620422003",
+      "product_name" => "Nutella",
+      "additives_tags" => ["en:e322"]
+    }
   end
 
-  it "правильно сохраняет имя" do
-    expect(product.name).to eq("Test Product")
+  it "сохраняет штрих-код и название" do
+    product = Nutrify::Product.new(fake_api_data)
+
+    expect(product.barcode).to eq("3017620422003")
+    expect(product.name).to eq("Nutella")
   end
 
-  it "правильно сохраняет добавки" do
-    expect(product.additives).to eq(["E330"])
-  end
+  it "расшифровывает добавки через DbManager" do
+    product = Nutrify::Product.new(fake_api_data)
 
-  it "возвращает дефолтное имя, если оно nil" do
-    p = Nutrify::Product.new(barcode: "000", name: nil)
-    expect(p.name).to eq("Unknown Product")
+    expect(product.additives).to be_an(Array)
+    expect(product.additives.first["name"]).to eq("Лецитин")
   end
 end

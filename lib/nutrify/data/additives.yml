@@ -1,0 +1,13 @@
+# lib/nutrify/data/additives.yml
+en:e322:
+  name: "Лецитин"
+  danger: "low"
+  description: "Натуральный эмульгатор. Безопасен."
+en:e322i:
+  name: "Лецитин (очищенный)"
+  danger: "low"
+  description: "Очищенная форма эмульгатора."
+en:e476:
+  name: "Полиглицерин"
+  danger: "medium"
+  description: "Эмульгатор, избыток может влиять на почки."

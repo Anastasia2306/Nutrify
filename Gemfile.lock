@@ -3,6 +3,7 @@ PATH
   specs:
     Nutrify (0.1.0)
       faraday (~> 2.0)
+      faraday-retry
 
 GEM
   remote: https://rubygems.org/
@@ -17,6 +18,8 @@ GEM
       logger
     faraday-net_http (3.4.2)
       net-http (~> 0.5)
+    faraday-retry (2.4.0)
+      faraday (~> 2.0)
     io-console (0.8.2)
     irb (1.17.0)
       pp (>= 0.6.0)
