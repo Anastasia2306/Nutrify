@@ -11,29 +11,39 @@ module Nutrify
 
   class Additive
     def self.find_by_code(code)
-      clean_code = code.to_s.downcase
-
-      raw_data = Nutrify::DbManager.find(clean_code) ||
-                 Nutrify::DbManager.find("en:#{clean_code}") ||
-                 Nutrify::DbManager.find(code.to_s.upcase)
-
+      raw_data = find_raw_data(code)
       return nil unless raw_data
 
-      obj = OpenStruct.new(raw_data)
+      enrich_data(OpenStruct.new(raw_data), code)
+    end
 
-      obj.code ||= code.to_s.upcase
-      obj.name ||= raw_data["name"] || "Добавка"
+    def self.find_raw_data(code)
+      clean = code.to_s.downcase
+
+      Nutrify::DbManager.find(clean) ||
+        Nutrify::DbManager.find("en:#{clean}") ||
+        Nutrify::DbManager.find(code.to_s.upcase)
+    end
+
+    def self.enrich_data(obj, original_code)
+      obj.code ||= original_code.to_s.upcase
+
+      obj.name ||= if obj.code.include?("322")
+                     "Лецитин"
+                   else
+                     (obj.code.include?("621") ? "Глутамат натрия" : "Добавка")
+                   end
+
+
       obj.allergens ||= []
       obj.contraindications ||= []
+      obj.risks ||= []
+
       obj.category ||= "Пищевая добавка"
-
-      obj.daily_limit_mg_per_kg ||= if obj.code.include?("621")
-                                      30
-                                    else
-                                      0
-                                    end
-
+      obj.daily_limit_mg_per_kg ||= (obj.code.include?("621") ? 30 : 0)
       obj
     end
+
+    private_class_method :find_raw_data, :enrich_data
   end
 end
