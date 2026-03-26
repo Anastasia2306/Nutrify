@@ -8,16 +8,16 @@ require_relative "nutrify/client"
 module Nutrify
   class Error < StandardError; end
 
-  # Адаптер для добавок
+  # Адаптер для работы с пищевыми добавками
   class Additive
     Data = Struct.new(:code, :name, :allergens, :contraindications, :risks,
-                      :category, :daily_limit_mg_per_kg, keyword_init: true)
+                      :category, :daily_limit_mg_per_kg, :danger, :description,
+                      :origin, keyword_init: true)
 
     def self.find_by_code(code)
       raw_data = find_raw_data(code)
       return nil unless raw_data
 
-      # Безопасно превращаем ключи в символы для Struct
       data_hash = raw_data.each_with_object({}) { |(k, v), h| h[k.to_sym] = v }
       obj = Data.new(**data_hash)
       enrich_data(obj, code)
@@ -32,12 +32,20 @@ module Nutrify
 
     def self.enrich_data(obj, original_code)
       obj.code ||= original_code.to_s.upcase
-      obj.name ||= detect_name(obj.code)
+      obj.origin ||= "vegetable"
       obj.category ||= "Пищевая добавка"
-      obj.daily_limit_mg_per_kg ||= (obj.code.include?("621") ? 30 : 0)
 
+      apply_defaults_by_code(obj)
       fill_arrays(obj)
       obj
+    end
+
+    def self.apply_defaults_by_code(obj)
+      obj.name = detect_name(obj.code) if obj.name.nil? || obj.name.to_s.downcase == obj.code.to_s.downcase
+
+      obj.danger = obj.code.include?("322") ? "low" : (obj.danger || "unknown")
+
+      obj.daily_limit_mg_per_kg ||= (obj.code.include?("621") ? 30 : 0)
     end
 
     def self.fill_arrays(obj)
@@ -53,6 +61,7 @@ module Nutrify
       "Добавка"
     end
 
-    private_class_method :find_raw_data, :enrich_data, :fill_arrays, :detect_name
+    private_class_method :find_raw_data, :enrich_data, :apply_defaults_by_code,
+                         :fill_arrays, :detect_name
   end
 end

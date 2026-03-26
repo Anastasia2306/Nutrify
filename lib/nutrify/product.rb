@@ -5,12 +5,20 @@ module Nutrify
     attr_reader :barcode, :name, :additives
 
     def initialize(data)
-      @barcode = data["code"]
-      @name = data["product_name"] || "Unknown"
+      if data.is_a?(Hash)
+        @barcode   = data["code"] || data[:code]
+        @name      = data["product_name"] || data[:product_name] || "Неизвестный продукт"
+        raw_tags   = data["additives_tags"] || []
 
-      codes = data["additives_tags"] || []
-
-      @additives = codes.map { |code| Nutrify::DbManager.find(code) }
+        @additives = raw_tags.map do |tag|
+          code = tag.split(":").last.upcase
+          Nutrify::Additive.find_by_code(code)
+        end.compact
+      else
+        @barcode   = data.to_s
+        @name      = "Неизвестный продукт"
+        @additives = []
+      end
     end
   end
 end
