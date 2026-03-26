@@ -67,7 +67,7 @@ module NutriAnalyzer
 
     def contraindicated?(add)
       add.contraindications.any? do |c|
-        profile.contraindication?(c)  # Исправлено: было has_contraindication?, теперь contraindication?
+        profile.contraindication?(c) # Исправлено: было has_contraindication?, теперь contraindication?
       end
     end
 
