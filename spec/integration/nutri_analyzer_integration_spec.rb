@@ -185,16 +185,16 @@ RSpec.describe "NutriAnalyzer Integration Tests" do
         "product_name" => "Test Product",
         "additives_tags" => ["en:e322"]
       }
-      
+
       # Создаём реальный объект Product
       real_product = Nutrify::Product.new(product_data)
-      
+
       # Мокируем метод analyze для любого экземпляра клиента
       allow_any_instance_of(Nutrify::Client).to receive(:analyze).and_return(real_product)
-      
+
       client = Nutrify::Client.new
       product = client.analyze("1234567890")
-      
+
       # Проверяем результат
       expect(product).to be_a(Nutrify::Product)
       expect(product.barcode).to eq("1234567890")

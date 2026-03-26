@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 require "spec_helper"
 
 RSpec.describe NutriAnalyzer::Parser do
