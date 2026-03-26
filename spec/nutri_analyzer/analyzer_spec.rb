@@ -5,15 +5,20 @@ require "spec_helper"
 RSpec.describe NutriAnalyzer::Analyzer do
   let(:default_profile) { NutriAnalyzer::Profile.new }
 
+  # Вспомогательный метод для получения добавок
+  def additive_for_code(code)
+    NutriAnalyzer::Additive.find_by_code(code)
+  end
+
   describe "#initialize" do
     it "создаёт анализатор с добавками" do
-      additives = [Nutrify::Additive.find_by_code("E621")]
+      additives = [additive_for_code("E621")]
       analyzer = described_class.new(additives)
       expect(analyzer.additives).to eq(additives)
     end
 
     it "использует профиль по умолчанию" do
-      additives = [Nutrify::Additive.find_by_code("E621")]
+      additives = [additive_for_code("E621")]
       analyzer = described_class.new(additives)
       expect(analyzer.profile).to be_a(NutriAnalyzer::Profile)
     end
@@ -21,7 +26,7 @@ RSpec.describe NutriAnalyzer::Analyzer do
 
   describe "#analyze" do
     context "с безопасными добавками" do
-      let(:additives) { [Nutrify::Additive.find_by_code("E322")] }
+      let(:additives) { [additive_for_code("E322")] }
       let(:analyzer) { described_class.new(additives, default_profile) }
 
       it "отмечает добавку как безопасную" do
@@ -34,7 +39,7 @@ RSpec.describe NutriAnalyzer::Analyzer do
 
     context "с аллергией" do
       let(:profile) { NutriAnalyzer::Profile.new(allergies: ["соя"]) }
-      let(:additives) { [Nutrify::Additive.find_by_code("E322")] }
+      let(:additives) { [additive_for_code("E322")] }
       let(:analyzer) { described_class.new(additives, profile) }
 
       it "отмечает добавку как опасную" do
@@ -46,7 +51,7 @@ RSpec.describe NutriAnalyzer::Analyzer do
 
     context "с противопоказаниями" do
       let(:profile) { NutriAnalyzer::Profile.new(chronic_diseases: ["астма"]) }
-      let(:additives) { [Nutrify::Additive.find_by_code("E102")] }
+      let(:additives) { [additive_for_code("E102")] }
       let(:analyzer) { described_class.new(additives, profile) }
 
       it "отмечает добавку как опасную" do
@@ -57,7 +62,7 @@ RSpec.describe NutriAnalyzer::Analyzer do
 
     context "с рисками для детей" do
       let(:profile) { NutriAnalyzer::Profile.new(age: 8) }
-      let(:additives) { [Nutrify::Additive.find_by_code("E102")] }
+      let(:additives) { [additive_for_code("E102")] }
       let(:analyzer) { described_class.new(additives, profile) }
 
       it "отмечает добавку как рискованную" do

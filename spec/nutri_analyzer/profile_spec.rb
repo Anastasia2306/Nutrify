@@ -95,16 +95,16 @@ RSpec.describe NutriAnalyzer::Profile do
     end
   end
 
-  describe "#has_contraindication?" do
+  describe "#contraindication?" do
     let(:profile) { described_class.new(chronic_diseases: %w[астма диабет]) }
 
     it "возвращает true при частичном совпадении" do
-      expect(profile.has_contraindication?("астма")).to be true
-      expect(profile.has_contraindication?("бронхиальная астма")).to be true
+      expect(profile.contraindication?("астма")).to be true
+      expect(profile.contraindication?("бронхиальная астма")).to be true
     end
 
     it "возвращает false при отсутствии совпадения" do
-      expect(profile.has_contraindication?("аллергия")).to be false
+      expect(profile.contraindication?("аллергия")).to be false
     end
   end
 
@@ -121,7 +121,7 @@ RSpec.describe NutriAnalyzer::Profile do
   end
 
   describe "#max_safe_daily_mg" do
-    let(:additive) { Nutrify::Additive.find_by_code("E621") }
+    let(:additive) { NutriAnalyzer::Additive.find_by_code("E621") }
     let(:profile) { described_class.new(weight_kg: 70) }
 
     it "рассчитывает безопасную дозу" do
