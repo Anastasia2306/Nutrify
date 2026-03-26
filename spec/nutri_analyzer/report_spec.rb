@@ -3,10 +3,14 @@
 require "spec_helper"
 
 RSpec.describe NutriAnalyzer::Report do
+  def additive_for_code(code)
+    NutriAnalyzer::Additive.find_by_code(code)
+  end
+
   let(:additives) do
     [
-      Nutrify::Additive.find_by_code("E621"),
-      Nutrify::Additive.find_by_code("E322")
+      additive_for_code("E621"),
+      additive_for_code("E322")
     ]
   end
 
