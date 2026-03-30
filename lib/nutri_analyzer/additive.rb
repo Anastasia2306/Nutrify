@@ -1,6 +1,6 @@
+# lib/nutri_analyzer/additive.rb
 # frozen_string_literal: true
 
-# lib/nutri_analyzer/additive.rb
 module NutriAnalyzer
   # Класс, предоставляющий информацию о пищевой добавке.
   class Additive

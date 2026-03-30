@@ -1,6 +1,6 @@
+# lib/nutri_analyzer/report.rb
 # frozen_string_literal: true
 
-# lib/nutri_analyzer/report.rb
 module NutriAnalyzer
   # Генерирует текстовый отчёт по результатам анализа
   class Report
@@ -37,7 +37,7 @@ module NutriAnalyzer
       report << "\nДобавки с потенциальными рисками:"
       risky_items.each do |item|
         add = item[:additive]
-        report << "  • #{add.name} (#{add.code})"
+        report << "  • [?] #{add.name} (#{add.code})"
         item[:reasons].each { |r| report << "    - #{r}" }
       end
     end
@@ -49,7 +49,7 @@ module NutriAnalyzer
       report << "\nОпасные добавки (не рекомендуются для вас):"
       dangerous_items.each do |item|
         add = item[:additive]
-        report << "  • #{add.name} (#{add.code})"
+        report << "  • [!] #{add.name} (#{add.code})"
         item[:reasons].each { |r| report << "    - #{r}" }
       end
     end
