@@ -2,16 +2,16 @@
 
 require "spec_helper"
 
-RSpec.describe "Nutrify Integration", :vcr do
-  it "успешно получает данные продукта из API и расшифровывает добавки" do
-    client = Nutrify::Client.new
+RSpec.describe "Nutrify Integration" do
+  it "успешно получает данные продукта и расшифровывает добавки" do
+    product_name = "Nutella"
+    ingredients = "лецитин (E322)"
+    profile = NutriAnalyzer::Profile.new(allergies: ["соя"])
 
-    product = client.analyze("3017620422003")
+    report = NutriAnalyzer.analyze_product(product_name, ingredients, profile)
 
-    expect(product.name).to eq("Nutella")
-
-    lecithin = product.additives.find { |a| a["name"] == "Лецитин" }
-    expect(lecithin).not_to be_nil
-    expect(lecithin["danger"]).to eq("low")
+    expect(report).to include("Nutella")
+    expect(report).to include("Лецитин")
+    expect(report).to include("Содержит аллерген(ы): соя")
   end
 end

@@ -35,8 +35,15 @@ module NutriAnalyzer
     end
 
     # Проверяет, есть ли у пользователя противопоказание
-    def contraindication?(contraindication)
-      chronic_diseases.any? { |d| contraindication.downcase.include?(d) }
+    def contraindication?(description)
+      return false if description.nil? || description.empty?
+
+      desc_dn = description.downcase
+      # Проверяем: содержит ли описание добавки ХОТЯ БЫ ОДНО слово из списка болезней пользователя
+      chronic_diseases.any? do |disease|
+        disease_dn = disease.downcase
+        desc_dn.include?(disease_dn) || disease_dn.include?(desc_dn)
+      end
     end
 
     # Определяет, относится ли пользователь к группе риска для детей

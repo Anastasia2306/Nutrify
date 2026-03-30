@@ -15,6 +15,7 @@ GEM
     crack (1.0.1)
       bigdecimal
       rexml
+    csv (3.3.5)
     date (3.5.1)
     diff-lcs (1.6.2)
     erb (6.0.2)
@@ -27,6 +28,10 @@ GEM
     faraday-retry (2.4.0)
       faraday (~> 2.0)
     hashdiff (1.2.1)
+    httparty (0.24.2)
+      csv
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
     io-console (0.8.2)
     irb (1.17.0)
       pp (>= 0.6.0)
@@ -37,8 +42,15 @@ GEM
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     logger (1.7.0)
+    mini_mime (1.1.5)
+    multi_xml (0.8.1)
+      bigdecimal (>= 3.1, < 5)
     net-http (0.9.1)
       uri (>= 0.11.1)
+    nokogiri (1.19.2-x64-mingw-ucrt)
+      racc (~> 1.4)
+    nokogiri (1.19.2-x86_64-linux-gnu)
+      racc (~> 1.4)
     parallel (1.27.0)
     parser (3.3.10.2)
       ast (~> 2.4.1)
@@ -108,7 +120,9 @@ PLATFORMS
 
 DEPENDENCIES
   Nutrify!
+  httparty
   irb
+  nokogiri
   rake (~> 13.0)
   rspec (~> 3.0)
   rubocop (~> 1.21)

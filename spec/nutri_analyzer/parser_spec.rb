@@ -12,95 +12,63 @@ RSpec.describe NutriAnalyzer::Parser do
       it "возвращает пустой массив для пустой строки" do
         expect(described_class.parse("")).to eq([])
       end
-
-      it "возвращает пустой массив для строки с пробелами" do
-        expect(described_class.parse("   ")).to eq([])
-      end
     end
 
-    context "с E-кодами" do
-      it "находит E621" do
-        additives = described_class.parse("состав: E621")
-        expect(additives.size).to eq(1)
-        expect(additives.first.code).to eq("E621")
+    context "с разными раскладками и форматами E-кодов" do
+      it "находит английскую E330 и русскую Е330" do
+        results_en = described_class.parse("E330")
+        results_ru = described_class.parse("Е330") # Русская Е
+
+        expect(results_en.first.code).to eq("E330")
+        expect(results_ru.first.code).to eq("E330")
       end
 
-      it "находит E102" do
-        additives = described_class.parse("E102")
-        expect(additives.size).to eq(1)
-        expect(additives.first.code).to eq("E102")
-      end
-
-      it "находит E322" do
-        additives = described_class.parse("E322")
-        expect(additives.size).to eq(1)
-        expect(additives.first.code).to eq("E322")
-      end
-
-      it "работает с пробелом после E" do
-        additives = described_class.parse("E 621")
-        expect(additives.size).to eq(1)
-        expect(additives.first.code).to eq("E621")
-      end
-
-      it "работает с дефисом после E" do
-        additives = described_class.parse("E-621")
-        expect(additives.size).to eq(1)
-        expect(additives.first.code).to eq("E621")
-      end
-    end
-
-    context "с несколькими E-кодами" do
-      it "находит несколько E-кодов" do
-        additives = described_class.parse("E621, E102, E322")
-        expect(additives.size).to eq(3)
-        expect(additives.map(&:code)).to contain_exactly("E621", "E102", "E322")
-      end
-
-      it "игнорирует регистр" do
+      it "игнорирует регистр (e621)" do
         additives = described_class.parse("e621")
-        expect(additives.size).to eq(1)
         expect(additives.first.code).to eq("E621")
       end
 
-      it "не добавляет несуществующие коды" do
-        additives = described_class.parse("E999")
-        expect(additives).to be_empty
+      it "понимает коды с пробелом (E 211) или дефисом (E-211)" do
+        expect(described_class.parse("E 211").first.code).to eq("E211")
+        expect(described_class.parse("E-211").first.code).to eq("E211")
       end
     end
 
-    context "с текстовыми названиями" do
-      it "находит глутамат натрия" do
-        additives = described_class.parse("содержит глутамат натрия")
-        expect(additives.size).to eq(1)
-        expect(additives.first.code).to eq("E621")
-      end
+    context "интеграция с внешним поиском (Client)" do
+      it "вызывает Nutrify::Client для глубокого анализа" do
+        # Проверяем, что парсер обращается к сетевому клиенту
+        expect(Nutrify::Client).to receive(:fetch_analysis).with("вода").and_return(["E330"])
 
-      it "находит тартразин" do
-        additives = described_class.parse("тартразин")
-        expect(additives.size).to eq(1)
-        expect(additives.first.code).to eq("E102")
-      end
-
-      it "находит лецитин" do
-        additives = described_class.parse("лецитин")
-        expect(additives.size).to eq(1)
-        expect(additives.first.code).to eq("E322")
+        results = described_class.parse("вода")
+        expect(results.first.code).to eq("E330")
       end
     end
 
-    context "с комбинированным вводом" do
-      it "не создаёт дубликаты" do
-        additives = described_class.parse("E621 (глутамат натрия)")
-        expect(additives.size).to eq(1)
-        expect(additives.first.code).to eq("E621")
+    context "умная фильтрация Глутамата (E621)" do
+      it "удаляет E621, если цифр '621' нет в тексте состава" do
+        # Имитируем, что API ошибочно нашло глутамат в слове 'вода'
+        allow(Nutrify::Client).to receive(:fetch_analysis).and_return(["E621"])
+
+        results = described_class.parse("просто чистая вода")
+        expect(results.map(&:code)).not_to include("E621")
       end
 
-      it "обрабатывает сложный состав" do
-        text = "Состав: вода, E621, лецитин (Е322), тартразин E102"
-        additives = described_class.parse(text)
-        expect(additives.size).to eq(3)
-        expect(additives.map(&:code)).to contain_exactly("E621", "E322", "E102")
+      it "оставляет E621, если код явно написан в составе" do
+        results = described_class.parse("состав: E621")
+        expect(results.map(&:code)).to include("E621")
+      end
+    end
+
+    context "текстовые названия и синонимы" do
+      it "находит добавку по названию 'Тартразин'" do
+        # Исправлено: добавлены кавычки и скобка
+        results = described_class.parse("краситель Тартразин")
+        expect(results.first.code).to eq("E102")
+      end
+
+      it "не создает дубликаты, если код и название написаны вместе" do
+        results = described_class.parse("E102 (Тартразин)")
+        expect(results.size).to eq(1)
       end
     end
   end

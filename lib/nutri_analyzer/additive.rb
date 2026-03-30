@@ -6,6 +6,24 @@ module NutriAnalyzer
   class Additive
     # Пример данных (в реальности загружается из API)
     DATA = {
+      "E330" => {
+        name: "Лимонная кислота",
+        category: "антиокислитель",
+        origin: "растительное",
+        risks: [],
+        contraindications: [],
+        daily_limit_mg_per_kg: nil,
+        allergens: []
+      },
+      "E211" => {
+        name: "Бензоат натрия",
+        category: "консервант",
+        origin: "синтетическое",
+        risks: ["аллергия"],
+        contraindications: ["астма"],
+        daily_limit_mg_per_kg: 5,
+        allergens: []
+      },
       "E621" => {
         name: "Глутамат натрия",
         category: "усилитель вкуса",

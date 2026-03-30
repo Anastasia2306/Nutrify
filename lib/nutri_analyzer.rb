@@ -3,7 +3,9 @@
 # lib/nutri_analyzer.rb
 require_relative "nutri_analyzer/version"
 require_relative "nutri_analyzer/additive"
+require_relative "nutri_analyzer/client"
 require_relative "nutri_analyzer/parser"
+require_relative "nutri_analyzer/product"
 require_relative "nutri_analyzer/profile"
 require_relative "nutri_analyzer/analyzer"
 require_relative "nutri_analyzer/report"

@@ -2,26 +2,17 @@
 
 require "spec_helper"
 
-RSpec.describe Nutrify::Product do
-  let(:fake_api_data) do
-    {
-      "code" => "3017620422003",
-      "product_name" => "Nutella",
-      "additives_tags" => ["en:e322"]
-    }
-  end
+RSpec.describe NutriAnalyzer::Product do
+  let(:name) { "Тестовый продукт" }
+  let(:ingredients) { "Вода, сахар, E322, Тартразин" }
 
-  it "сохраняет штрих-код и название" do
-    product = Nutrify::Product.new(fake_api_data)
+  it "сохраняет название и парсит добавки" do
+    product = NutriAnalyzer::Product.new(name, ingredients)
 
-    expect(product.barcode).to eq("3017620422003")
-    expect(product.name).to eq("Nutella")
-  end
-
-  it "расшифровывает добавки через DbManager" do
-    product = Nutrify::Product.new(fake_api_data)
-
-    expect(product.additives).to be_an(Array)
-    expect(product.additives.first["name"]).to eq("Лецитин")
+    expect(product.name).to eq(name)
+    # Проверяем коды
+    codes = product.additives.map(&:code)
+    expect(codes).to include("E322")
+    expect(codes).to include("E102")
   end
 end

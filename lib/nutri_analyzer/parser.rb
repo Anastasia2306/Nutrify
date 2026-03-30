@@ -1,63 +1,52 @@
-# lib/nutri_analyzer/parser.rb
 # frozen_string_literal: true
 
+require_relative "client"
+require_relative "../nutrify/data"
+
 module NutriAnalyzer
-  # Извлекает из текста состава список добавок (E-коды и названия)
+  # Извлекает добавки из текста состава
   class Parser
-    SYNONYMS = {
-      "глутамат натрия" => "E621",
-      "тартразин" => "E102",
-      "лецитин" => "E322",
-      "бензойная кислота" => "E210",
-      "аскорбиновая кислота" => "E300",
-      "нитрит натрия" => "E250",
-      "аспартам" => "E951"
-    }.freeze
+    E_CODE_REGEX = /[EeЕе][- ]?(\d{3,4})/i
 
-    E_CODE_REGEX = /\bE[- ]?(\d{3,4})\b/i
+    def self.parse(text)
+      text = text.to_s unless text.is_a?(String)
+      return [] if text.strip.empty?
 
-    def self.parse(ingredients_text)
-      return [] if ingredients_text.to_s.empty?
+      text_dn = text.downcase
+      additives = extract_by_e_codes(text_dn) + extract_by_names(text_dn)
+      additives += fetch_external_if_needed(additives, text)
 
-      text = ingredients_text.downcase
-      additives = []
-
-      additives.concat(extract_by_e_codes(text))
-      additives.concat(extract_by_synonyms(text))
-      additives.concat(extract_by_names(text))
-
-      additives.uniq(&:code)
+      additives.compact.uniq(&:code)
     end
 
-    private_class_method def self.extract_by_e_codes(text)
-      additives = []
+    def self.fetch_external_if_needed(current_additives, text)
+      # Проверка: если ничего не нашли и это похоже на одно слово/код
+      return [] unless current_additives.empty? && text.length > 2 && !text.include?(" ")
+
+      external_codes = Nutrify::Client.fetch_analysis(text)
+      external_codes.map { |code| Additive.find_by_code(code) }
+    end
+
+    def self.extract_by_e_codes(text)
+      found = []
       text.scan(E_CODE_REGEX) do |match|
-        code = "E#{match[0].upcase}"
-        additive = Additive.find_by_code(code)
-        additives << additive if additive
+        additive = Additive.find_by_code("E#{match[0]}")
+        found << additive if additive
       end
-      additives
+      found
     end
 
-    private_class_method def self.extract_by_synonyms(text)
-      additives = []
-      SYNONYMS.each do |name, code|
-        next unless text.include?(name.downcase)
-
-        additive = Additive.find_by_code(code)
-        additives << additive if additive
-      end
-      additives
+    def self.extract_by_names(text)
+      Additive.all.select { |additive| text.include?(additive.name.downcase) }
     end
 
-    private_class_method def self.extract_by_names(text)
-      additives = []
-      Additive.all.each do |additive|
-        next if additives.any? { |a| a.code == additive.code }
-
-        additives << additive if text.include?(additive.name.downcase)
+    # Метод для фильтрации
+    def self.filter_msg(additives, text)
+      additives.reject do |a|
+        a.code == "E621" && !text.include?("621") && !text.downcase.include?("глутамат")
       end
-      additives
     end
+
+    private_class_method :fetch_external_if_needed, :extract_by_e_codes, :extract_by_names
   end
 end

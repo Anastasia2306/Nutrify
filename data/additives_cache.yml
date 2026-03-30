@@ -1,0 +1,21 @@
+---
+E330:
+  name: E330
+  danger: low
+  updated_at: '2026-03-30 16:16:33 +0300'
+E211:
+  name: E211
+  danger: low
+  updated_at: '2026-03-30 16:16:33 +0300'
+E621:
+  name: E621
+  danger: low
+  updated_at: '2026-03-30 16:16:33 +0300'
+E102:
+  name: E102
+  danger: low
+  updated_at: '2026-03-30 16:16:33 +0300'
+E322:
+  name: E322
+  danger: low
+  updated_at: '2026-03-30 16:16:33 +0300'
